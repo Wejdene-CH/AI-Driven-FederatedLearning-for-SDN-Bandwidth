@@ -1,4 +1,3 @@
-#ryu-manager simple_switch_13.py
 import json
 import logging
 from datetime import datetime
@@ -31,7 +30,6 @@ class SimpleSwitch13(app_manager.RyuApp):
             "event_type": "sdn_packet_forward"
         }
         
-        # Write to log file for Filebeat
         with open('/var/log/ryu/sdn_events.log', 'a') as log_file:
             json.dump(log_entry, log_file)
             log_file.write('\n')
@@ -42,7 +40,6 @@ class SimpleSwitch13(app_manager.RyuApp):
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
 
-        # install table-miss flow entry
         match = parser.OFPMatch()
         actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER,
                                           ofproto.OFPCML_NO_BUFFER)]
@@ -78,7 +75,6 @@ class SimpleSwitch13(app_manager.RyuApp):
         eth = pkt.get_protocols(ethernet.ethernet)[0]
 
         if eth.ethertype == ether_types.ETH_TYPE_LLDP:
-            # ignore lldp packet
             return
         dst = eth.dst
         src = eth.src
@@ -87,8 +83,6 @@ class SimpleSwitch13(app_manager.RyuApp):
         self.mac_to_port.setdefault(dpid, {})
 
         self.logger.info("packet in %s %s %s %s", dpid, src, dst, in_port)
-
-        # learn a mac address to avoid FLOOD next time.
         self.mac_to_port[dpid][src] = in_port
 
         if dst in self.mac_to_port[dpid]:
@@ -98,7 +92,6 @@ class SimpleSwitch13(app_manager.RyuApp):
 
         actions = [parser.OFPActionOutput(out_port)]
 
-        # install a flow to avoid packet_in next time
         if out_port != ofproto.OFPP_FLOOD:
             match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
             if msg.buffer_id != ofproto.OFP_NO_BUFFER:
@@ -115,5 +108,4 @@ class SimpleSwitch13(app_manager.RyuApp):
                                   in_port=in_port, actions=actions, data=data)
         datapath.send_msg(out)
 
-        # Log the packet forwarding event
         self._log_packet_event(dpid, src, dst, in_port, out_port)
