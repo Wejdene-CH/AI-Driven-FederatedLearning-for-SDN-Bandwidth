@@ -1,0 +1,107 @@
+Original DataFrame info:
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 16014 entries, 0 to 16013
+Data columns (total 9 columns):
+ #   Column       Non-Null Count  Dtype  
+---  ------       --------------  -----  
+ 0   No.          16014 non-null  int64  
+ 1   Time         16014 non-null  float64
+ 2   Source       16014 non-null  object 
+ 3   Destination  16014 non-null  object 
+ 4   Protocol     16014 non-null  object 
+ 5   Length       16014 non-null  int64  
+ 6   Info         16013 non-null  object 
+ 7   srcPort      16013 non-null  float64
+ 8   DestPort     16013 non-null  float64
+dtypes: float64(3), int64(2), object(4)
+memory usage: 1.1+ MB
+None
+
+First few rows:
+   No.      Time    Source  ...            Info srcPort  DestPort
+0    1  0.000000  10.0.0.1  ...  53  >  0 Len=0    53.0       0.0
+1    2  0.000035  10.0.0.1  ...  53  >  0 Len=0    53.0       0.0
+2    3  0.000058  10.0.0.1  ...  53  >  0 Len=0    53.0       0.0
+3    4  0.000081  10.0.0.1  ...  53  >  0 Len=0    53.0       0.0
+4    5  0.000103  10.0.0.1  ...  53  >  0 Len=0    53.0       0.0
+
+[5 rows x 9 columns]
+
+Missing values before preprocessing:
+No.            0
+Time           0
+Source         0
+Destination    0
+Protocol       0
+Length         0
+Info           1
+srcPort        1
+DestPort       1
+dtype: int64
+
+Checking for NaN or infinite values after filling:
+NaN in X: False
+Infinite in X: False
+NaN in y: False
+Infinite in y: False
+Model weights loaded successfully.
+Epoch [1/10], Loss: 0.7584
+Epoch [2/10], Loss: 0.7486
+Epoch [3/10], Loss: 0.7395
+Epoch [4/10], Loss: 0.7319
+Epoch [5/10], Loss: 0.7222
+Epoch [6/10], Loss: 0.7135
+Epoch [7/10], Loss: 0.7055
+Epoch [8/10], Loss: 0.6974
+Epoch [9/10], Loss: 0.6881
+Epoch [10/10], Loss: 0.6811
+Test Loss: 0.6725
+Test Accuracy: 1.0000
+Updated model weights saved to updated_model.pth
+Original DataFrame info:
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 16014 entries, 0 to 16013
+Data columns (total 9 columns):
+ #   Column       Non-Null Count  Dtype  
+---  ------       --------------  -----  
+ 0   No.          16014 non-null  int64  
+ 1   Time         16014 non-null  float64
+ 2   Source       16014 non-null  object 
+ 3   Destination  16014 non-null  object 
+ 4   Protocol     16014 non-null  object 
+ 5   Length       16014 non-null  int64  
+ 6   Info         16013 non-null  object 
+ 7   srcPort      16013 non-null  float64
+ 8   DestPort     16013 non-null  float64
+dtypes: float64(3), int64(2), object(4)
+memory usage: 1.1+ MB
+None
+
+First few rows:
+   No.      Time    Source  ...            Info srcPort  DestPort
+0    1  0.000000  10.0.0.1  ...  53  >  0 Len=0    53.0       0.0
+1    2  0.000035  10.0.0.1  ...  53  >  0 Len=0    53.0       0.0
+2    3  0.000058  10.0.0.1  ...  53  >  0 Len=0    53.0       0.0
+3    4  0.000081  10.0.0.1  ...  53  >  0 Len=0    53.0       0.0
+4    5  0.000103  10.0.0.1  ...  53  >  0 Len=0    53.0       0.0
+
+[5 rows x 9 columns]
+
+Missing values before preprocessing:
+No.            0
+Time           0
+Source         0
+Destination    0
+Protocol       0
+Length         0
+Info           1
+srcPort        1
+DestPort       1
+dtype: int64
+
+Checking for NaN or infinite values after filling:
+NaN in X: False
+Infinite in X: False
+NaN in y: False
+Infinite in y: False
+Sample Prediction Probability: 0.0000
