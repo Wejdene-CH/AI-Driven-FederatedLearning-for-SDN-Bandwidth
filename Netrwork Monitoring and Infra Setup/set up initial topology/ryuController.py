@@ -1,5 +1,7 @@
 import json
 import logging
+import threading
+import socket
 from datetime import datetime
 from ryu.base import app_manager
 from ryu.controller import ofp_event
@@ -9,14 +11,43 @@ from ryu.ofproto import ofproto_v1_3
 from ryu.lib.packet import packet
 from ryu.lib.packet import ethernet
 from ryu.lib.packet import ether_types
-
+from prometheus_client import Counter
 
 class SimpleSwitch13(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
 
+    packet_in_count = Counter('ryu_packet_in_count', 'Number of PacketIn events')
+    flows_added_count = Counter('ryu_flows_added_count', 'Number of flows added')
+
     def __init__(self, *args, **kwargs):
         super(SimpleSwitch13, self).__init__(*args, **kwargs)
         self.mac_to_port = {}
+
+        self.start_prometheus_server()
+
+    def start_prometheus_server(self):
+ 
+        def _start_server():
+            try:
+              
+                from http.server import HTTPServer
+                from prometheus_client import MetricsHandler
+
+                port = 9000
+                while True:
+                    try:
+                        server = HTTPServer(('', port), MetricsHandler)
+                        break
+                    except socket.error:
+                        port += 1
+                
+                self.logger.info(f"Prometheus metrics server starting on port {port}")
+                server.serve_forever()
+            except Exception as e:
+                self.logger.error(f"Failed to start Prometheus metrics server: {e}")
+
+        prometheus_thread = threading.Thread(target=_start_server, daemon=True)
+        prometheus_thread.start()
 
     def _log_packet_event(self, dpid, src, dst, in_port, out_port):
         """Log packet forwarding event to file."""
@@ -30,9 +61,12 @@ class SimpleSwitch13(app_manager.RyuApp):
             "event_type": "sdn_packet_forward"
         }
         
-        with open('/var/log/ryu/sdn_events.log', 'a') as log_file:
-            json.dump(log_entry, log_file)
-            log_file.write('\n')
+        try:
+            with open('/var/log/ryu/sdn_events.log', 'a') as log_file:
+                json.dump(log_entry, log_file)
+                log_file.write('\n')
+        except IOError as e:
+            self.logger.error(f"Failed to write log entry: {e}")
 
     @set_ev_cls(ofp_event.EventOFPSwitchFeatures, CONFIG_DISPATCHER)
     def switch_features_handler(self, ev):
@@ -59,6 +93,8 @@ class SimpleSwitch13(app_manager.RyuApp):
             mod = parser.OFPFlowMod(datapath=datapath, priority=priority,
                                     match=match, instructions=inst)
         datapath.send_msg(mod)
+
+        self.flows_added_count.inc()
 
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def _packet_in_handler(self, ev):
@@ -107,5 +143,7 @@ class SimpleSwitch13(app_manager.RyuApp):
         out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,
                                   in_port=in_port, actions=actions, data=data)
         datapath.send_msg(out)
+
+        self.packet_in_count.inc()
 
         self._log_packet_event(dpid, src, dst, in_port, out_port)
